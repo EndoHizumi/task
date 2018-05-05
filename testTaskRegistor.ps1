@@ -83,7 +83,7 @@ function assert-Return($actual,$expect,$result){
 
 function out-Log($value){
     $timestamp = date -f "yyyyMMddhhmmss"
-    $value |  out-file "testTaskreg${timestamp}.txt"
+    $value |  out-file "log\testTaskreg${timestamp}.txt"
 }
 
 "execute test-AddTask"
