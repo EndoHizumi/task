@@ -4,11 +4,12 @@ $today = date -Format "yyyy/MM/dd"
 function test-getTask(){
     "全て"
     $result = get-Tasks
-    assert-Return $result.count 11 $result
+    assert-Return $result.count 1 $result
 
     "タスク名で抽出"
     $result = get-Tasks "テストタスク" 1
     assert-Return $result.count 1 $result
+    
    
     "日付で抽出"
     $result = get-Tasks $today 2
@@ -23,19 +24,19 @@ function test-getTask(){
 function test-ShowTask(){
      "全て"
     $result = Show-Tasks
-    assert-Return $result.count 11 $result
+    assert-Return $result.count 5 $result
 
     "タスク名で抽出"
     $result = Show-Tasks "テストタスク" 1
-    assert-Return $result.count 1 $result
+    assert-Return $result.count 5 $result
    
     "日付で抽出"
     $result = Show-Tasks $today 2
-    assert-Return $result.count 1 $result
+    assert-Return $result.count 5 $result
 
     "2以上を指定したとき"
     $result = Show-Tasks $today 3
-    assert-Return $result.count 1 $result
+    assert-Return $result.count 5 $result
 }
 
 function test-AddTask(){
@@ -85,13 +86,16 @@ function out-Log($value){
     $value |  out-file "testTaskreg${timestamp}.txt"
 }
 
-"execute test-RemoveTask"
-test-RemoveTask
 "execute test-AddTask"
 test-AddTask
+"execute test-UpdateTask"
+test-UpdateTask
+"execute test-RemoveTask"
+test-RemoveTask
+add-task "テストタスク"
 "execute test-GetTask"
 test-getTask
 "execute test-ShowTask"
 test-ShowTask
-"execute test-UpdateTask"
-test-UpdateTask
+remove-task "テストタスク"
+disposeConnection $con

@@ -52,7 +52,7 @@ function runQuery($query,$connection){
         if ($reader -ne $null){
             $reader.Close()
         }
-
+     $connection.close()   
     }
 }
 
@@ -61,5 +61,9 @@ function StatementFactory([String]$class,[String]$type,[Array]$param){
     [string[]]$keys = $PSBoundParameters.Keys
     $queryObject = New-Object PSObject -Property $PSBoundParameters
     return $queryObject
+}
+
+function disposeConnection ($con) {
+   if($con -ne $null){$con.Dispose()}
 }
 

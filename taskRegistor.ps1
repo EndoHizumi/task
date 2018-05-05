@@ -1,52 +1,68 @@
-param($db = (Split-Path $MyInvocation.mycommand.path -Parent)+"\taskListDB.accdb")
-$erroractionpreference="stop"
+param($db = (Split-Path $MyInvocation.mycommand.path -Parent) + "\taskListDB.accdb")
+$erroractionpreference = "stop"
 .".\DBConnnect.ps1"
-$con = getConnection $db
 
-function Add-Task($workName,$workDay=""){
+function Add-Task($workName, $workDay = "",$endDay="",$priority="(C)") {
+    $con = getConnection $db
     $today = if ($workDay.length -eq 0) {get-date -f "yyyy/MM/dd"}
     $now = get-date -f "yyyy/MM/dd HH:mm:ss"
-    $query = "insert into TaskList (workName,workDay,updateAt,createAt) values ('${workName}','${today}','${now}','${now}')"
+    if ($workDay.length -eq 0){$workDay = $today}
+    $query = "insert into TaskList (workName,workDay,updateAt,createAt,startAt,endAt,priority) values ('${workName}','${workDay}','${now}','${now}','${workDay}','${endDay}','${priority}')"
     runQuery $query $con
+    disposeConnection $con
 }
 
-function get-Tasks($value="*",[int]$mode=1){
-    if ($mode -gt 2){$mode=2}
-    $modeList=("ID","workName","workDay")
+function get-Tasks($value = "*", [int]$mode = 1) {
+    $con = getConnection $db
+    if ($mode -gt 2) {$mode = 2}
+    $modeList = ("ID", "workName", "workDay")
     $query = if ($value -ne "*") {
         "select * from taskList where $($modeList[${mode}]) = '${value}'"
-    }else{
+    }
+    else {
         "select * from taskList"        
     }
-   runQuery $query $con
+    format-TaskList (runQuery $query $con)
+    disposeConnection $con
 }
 
-function Show-Tasks($value="*",[int]$mode=1){
-    $value = get-tasks $value $mode
-    $line=New-Object System.Collections.ArrayList
-    foreach($item in $value){
-        $columnObject =  New-Object PSObject
-        for($i=0;$i -lt $item.FieldCount;$i++){
-            Add-Member -InputObject $columnObject -Name col$i -Value $item.item($i) -MemberType NoteProperty
+function format-TaskList ([Array] $taskData) {
+    $taskList = New-Object System.Collections.ArrayList
+    foreach ($item in $taskData) {
+        $columnObject = New-Object PSObject
+        for ($i = 0; $i -lt $item.FieldCount; $i++) {
+            Add-Member -InputObject $columnObject -Name $item.getName($i) -Value $item.item($i) -MemberType NoteProperty
         }
-        [void] $line.add($columnObject)
+        [void] $taskList.add($columnObject)
     }
-    Write-Output $line | Format-Table
+    , $taskList
+
 }
 
-function remove-task($workName,$workDay,[int]$mode){
+function Show-Tasks($value = "*", [int]$mode = 1) {
+    $result = get-Tasks $value $mode 
+    $result | Format-Table
+}
+
+function remove-task($workName, $workDay, [int]$mode = 0) {
     # $mode = 0:作業名を指定して削除,1:作業日を指定して削除,2:作業日と作業名を指定して削除
-    $modeList=("workName = '${workName}'","workDay = '${workDay}'","workName = '${workName}' and workDay = '${workDay}'")
+    $con = getConnection $db
+    $modeList = ("workName like '${workName}'", "workDay = '${workDay}'", "workName like '${workName}' and workDay = '${workDay}'")
     $query = "delete from taskList where $($modeList[${mode}])"
-    $query
     runQuery $query $con
+    #AutoNumber型を振りなおす
+    $count = [int] (runQuery "select count(*) from tasklist" $con)[0] + 1
+    $query = "ALTER TABLE tasklist ALTER COLUMN id COUNTER(${count},1)"
+    runQuery $query $con
+    disposeConnection $con
 }
 
-function update-task($workName="",$new="",[int]$mode = 1){
-    $today = get-date -f "yyyy/MM/dd"
+function update-task($workName = "", $new = "", [int]$mode = 1) {
+    $con = getConnection $db
     $now = get-date -f "yyyy/MM/dd HH:mm:ss"
-    if ($mode -gt 1){$mode=1}
-    $modeList=("workName","workDay")
+    if ($mode -gt 1) {$mode = 1}
+    $modeList = ("workName", "workDay")
     $query = "update TaskList set $($modeList[${mode}])='${new}',updateAt='${now}' where $($modeList[0])='${workName}'"
     runQuery $query $con
+    disposeConnection $con
 }
