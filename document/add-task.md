@@ -38,3 +38,15 @@ Example4: add task "Test task" apeend priority
 ```powershell
 task Add-Task "Test task" -priority "(A)"
 ```
+
+Example5: add task "Test task" apeend project
+
+```powershell
+task Add-Task "Test task +testProject"
+```
+
+Example6: add task "Test task" apeend Context
+
+```powershell
+task Add-Task "Test task @review" -priority "(A)"
+```
