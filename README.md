@@ -20,9 +20,50 @@ task is Todo List manager on CLI
 'task' update-task ID [-taskName] <taskName> [-startDt] <yyyy/MM/dd> [-endDt]<yyyy/MM/dd>  [-project] <projectName> [-tag] <context Name> [-state] <state> [-priority] <(A) to (E)>
 ```
 
-remove-task|rm,remove|remove task
-show-task|ls,show| Display TaskList
-check-task|check,chk|Toggle state column value
+## Example
+
+Example1: add task "Test task"
+
+```powershell
+> task Add-Task "Test task"
+```
+[>> More example](document/add-task.md)
+
+Example2: show tasks
+
+```powershell
+> task Show-Tasks
+
+ID workName  workDay    updateAt            createAt            endAt project tag state priority
+-- --------  -------    --------            --------            ----- ------- --- ----- --------
+ 1 test Task 2018/05/06 2018/05/06 20:03:05 2018/05/06 20:03:05                   False (C)
+
+
+```
+[>> More example](document/show-task.md)
+
+Example3: check "Test task"
+
+```powershell
+> task Check-Task 1 
+```
+[>> More example](document/check-task.md)
+
+Example4: Remove "Test task"
+
+```powershell
+> task Remove-Task 1 
+```
+[>> More example](document/remove-task.md)
+
+Example5: Update "Test task"
+
+```powershell
+> task Update-Task 1 -startDt "2018/05/010"
+```
+[>> More example](document/update-task.md)
+
+
 
 ## Table Desgin
 
