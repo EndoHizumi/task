@@ -1,6 +1,8 @@
 .".\task.ps1"
 $today = date -Format "yyyy/MM/dd"
-function test-Addtask () {
+
+# simple add task
+function test-AddtaskOne () {
     add-task "test task"
     $tasklist = get-tasks
     if($taskList.count -ne 1 -or $taskList.taskName -ne "test task" ){
@@ -8,5 +10,14 @@ function test-Addtask () {
     }
 }
 
+# specified startDate
+# specified endDate
+# append projectName
+# append tagName
+# specified state
+# specified priority
+
+
+
 "execute test-Addtask"
-test-Addtask
+test-AddtaskOne
