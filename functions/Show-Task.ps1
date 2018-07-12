@@ -22,6 +22,6 @@ function get-Task($value = "*", [int]$mode = 1) {
 }
 
 function Show-Task($value = "*", [int]$mode = 1) {
-    $result = get-Tasks $value $mode 
+    $result = get-Task $value $mode 
     $result | Format-Table
 }
